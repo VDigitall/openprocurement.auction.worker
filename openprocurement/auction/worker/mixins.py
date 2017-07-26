@@ -177,21 +177,29 @@ class RequestIDServiceMixin(object):
 
 class AuditServiceMixin(object):
     """ Mixin class to create, modify and upload audit documents"""
+
     def prepare_audit(self):
+        # TODO: Є залежності з воркером
         self.audit = {
             "id": self.auction_doc_id,
             "tenderId": self._auction_data["data"].get("tenderID", ""),
             "tender_id": self.tender_id,
-            "timeline": {
-                "auction_start": {
-                    "initial_bids": []
+            "phases": {
+                "dutch": {
+                    "timeline": [],
+                    "dutchWinner": {}
+                },
+                "seald_bid": {
+                    "timeline": [],
+                    "seald_bid_winner": {}
+                },
+                "best_bid": {
+                    "timeline": [],
+                    "best_bid_winner": {}
                 }
             }
         }
-        if self.lot_id:
-            self.audit["lot_id"] = self.lot_id
-        for round_number in range(1, ROUNDS + 1):
-            self.audit['timeline']['round_{}'.format(round_number)] = {}
+
 
     def approve_audit_info_on_bid_stage(self):
         turn_in_round = self.current_stage - (
